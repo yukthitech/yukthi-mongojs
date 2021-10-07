@@ -5,7 +5,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.yukthitech.ccg.xml.XMLBeanParser;
-import com.yukthitech.mongojs.db.JsMongoDatabase;
 
 public class TestMongoJsEngine
 {
@@ -30,7 +29,7 @@ public class TestMongoJsEngine
 		return rows;
 	}
 	
-	public static void assertEquals(JsMongoDatabase database, Object actual, Object expected)
+	public static void assertEquals(Object actual, Object expected)
 	{
 		Assert.assertEquals(actual, expected);
 	}

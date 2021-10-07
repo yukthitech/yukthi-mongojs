@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.yukthitech.mongojs.MongoJsUtils;
 
 public class JsMongoCollection
 {
@@ -42,8 +43,10 @@ public class JsMongoCollection
 		this.collection = this.database.getCollection(this.name);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public String insert(Map<String, Object> doc)
 	{
+		doc = (Map<String, Object>) MongoJsUtils.unwrapObject(doc);
 		Document entityDoc = new Document(doc);
 		collection.insertOne(entityDoc);
 		
@@ -58,8 +61,12 @@ public class JsMongoCollection
 		return find(query, null);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Object find(Map<String, Object> query, Map<String, Object> projection) throws Exception
 	{
+		query = (Map<String, Object>) MongoJsUtils.unwrapObject(query);
+		projection = (Map<String, Object>) MongoJsUtils.unwrapObject(projection);
+		
 		Document filterDoc = new Document(query);
 		FindIterable<Document> resIt = collection.find(filterDoc);
 		

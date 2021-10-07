@@ -13,22 +13,32 @@ public class JsMethodWrapper implements JsMethod
 	
 	private JsMongoDatabase database;
 	
+	private boolean needDbArg;
+	
 	public JsMethodWrapper(Method actualMethod, JsMongoDatabase database)
 	{
 		this.actualMethod = actualMethod;
 		this.database = database;
+		
+		needDbArg = actualMethod.getParameterTypes()[0].equals(JsMongoDatabase.class);
 	}
-
+	
 	@Override
 	public Object call(Object... args)
 	{
-		Object array[] = new Object[args.length + 1];
+		int len = needDbArg ? args.length + 1 : args.length;
+		Object array[] = new Object[len];
+		int startIdx = 0;
 		
-		array[0] = database;
+		if(needDbArg)
+		{
+			array[0] = database;
+			startIdx = 1;
+		}
 		
 		for(int i = 0; i < args.length; i++)
 		{
-			array[i + 1] = args[i];
+			array[i + startIdx] = MongoJsUtils.unwrapObject(args[i]);
 		}
 		
 		try

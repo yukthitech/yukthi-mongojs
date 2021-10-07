@@ -1,13 +1,18 @@
 package com.yukthitech.mongojs;
 
-import org.bson.types.ObjectId;
+import java.util.Map;
 
-import com.yukthitech.mongojs.db.JsMongoDatabase;
+import org.bson.types.ObjectId;
 
 public class MongoMethods
 {
-	public static ObjectId ObjectId(JsMongoDatabase database, String id)
+	public static ObjectId ObjectId(String id)
 	{
 		return new ObjectId(id);
+	}
+	
+	public static void deleteProperty(Map<String, Object> obj, String attrName)
+	{
+		obj.remove(attrName);
 	}
 }
