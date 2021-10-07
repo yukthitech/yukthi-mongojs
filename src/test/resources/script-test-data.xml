@@ -1,0 +1,37 @@
+<test-data xmlns:r="/fw/ccg/XMLBeanParser">
+	<r:exprPattern enabled="false"/>
+	
+	<mongoJsArguments
+		replicas="localhost:27017"
+		dbname="test"
+	/>
+	
+	<script-bean name="insert">
+		<test-script><![CDATA[
+			var docToInsert = {
+				"name": "testName",
+				age: 100,
+				
+				"list": [
+					{"key": "k1", "value": "val1"},
+					{"key": "k2", "value": "val2"}
+				],
+				
+				"subdoc": {
+					"values": [1, 2, 3],
+					"date": "05/10/2021"
+				}
+			};
+			
+			var id = db.getCollection("MJS_TEST1").insert(docToInsert);
+			
+			var docs = db.MJS_TEST1.find({"name": "testName"});
+			docToInsert["_id"] = ObjectId(id);
+			
+			var expectedLst = [];
+			expectedLst.push(docToInsert);
+			
+			assertEquals(docs, docToInsert);
+		]]></test-script>
+	</script-bean>
+</test-data>
