@@ -49,5 +49,24 @@ public class MongoJsUtils
 		
 		return input;
 	}
+	
+	public static <T> T convert(Object input, Class<T> type)
+	{
+		if(input == null)
+		{
+			return null;
+		}
+		
+		try
+		{
+			input = unwrapObject(input);
+			String json = MongoMethods.toJson(input);
+			
+			return (T) MongoMethods.OBJ_MAPPER.readValue(json, type);
+		}catch(Exception ex)
+		{
+			throw new IllegalStateException("An error occurred while converting input to specified type: " + type.getName(), ex);
+		}
+	}
 
 }

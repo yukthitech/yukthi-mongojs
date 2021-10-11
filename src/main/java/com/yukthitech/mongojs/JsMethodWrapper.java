@@ -1,6 +1,7 @@
 package com.yukthitech.mongojs;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import com.yukthitech.mongojs.db.JsMongoDatabase;
 
@@ -46,7 +47,12 @@ public class JsMethodWrapper implements JsMethod
 			return actualMethod.invoke(null, array);
 		} catch(Exception ex)
 		{
-			throw new IllegalStateException("Method invocation resulted in error", ex);
+			throw new IllegalStateException(String.format(
+					"Method invocation resulted in error.\nMethod: %s.%s()\nArguments: %s",
+					actualMethod.getDeclaringClass().getName(),
+					actualMethod.getName(),
+					Arrays.toString(array)
+					), ex);
 		}
 	}
 }

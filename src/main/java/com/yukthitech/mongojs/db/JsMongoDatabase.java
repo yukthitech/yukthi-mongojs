@@ -3,6 +3,9 @@ package com.yukthitech.mongojs.db;
 import java.util.AbstractMap;
 import java.util.Set;
 
+import org.bson.Document;
+
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 public class JsMongoDatabase extends AbstractMap<String, JsMongoCollection>
@@ -21,6 +24,11 @@ public class JsMongoDatabase extends AbstractMap<String, JsMongoCollection>
 	{
 		return new JsMongoCollection(database, name);
 	}
+	
+	public MongoCollection<Document> getMongoCollection(String name)
+	{
+		return database.getCollection(name);
+	}
 
 	@Override
 	public Set<Entry<String, JsMongoCollection>> entrySet()
@@ -32,5 +40,11 @@ public class JsMongoDatabase extends AbstractMap<String, JsMongoCollection>
 	public JsMongoCollection get(Object key)
 	{
 		return getCollection(key.toString());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "[JsMongoDatabase]";
 	}
 }

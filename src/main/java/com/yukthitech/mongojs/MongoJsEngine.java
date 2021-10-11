@@ -92,7 +92,7 @@ public class MongoJsEngine
 		
 		for(Method met : methods)
 		{
-			if(!Modifier.isStatic(met.getModifiers()))
+			if(!Modifier.isStatic(met.getModifiers()) || met.isSynthetic())
 			{
 				continue;
 			}

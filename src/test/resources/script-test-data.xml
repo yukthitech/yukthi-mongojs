@@ -23,15 +23,162 @@
 				}
 			};
 			
+			db.MJS_TEST1.deleteMany({});
+			
 			var id = db.getCollection("MJS_TEST1").insert(docToInsert);
 			
 			var docs = db.MJS_TEST1.find({"name": "testName"});
-			deleteProperty(docs[0], "_id");
+			var doc = docToMap(docs[0]);
+			deleteProperty(doc, "_id");
 			
-			var expectedLst = [];
-			expectedLst.push(docToInsert);
+			assertEquals(doc, docToInsert);
+		]]></test-script>
+
+	</script-bean>
+
+	<script-bean name="update">
+		<test-script><![CDATA[
+			var docPostUpdate = {
+				"name": "testName",
+				age: 100,
+				
+				"list": [
+					{"key": "k1", "value": "val1-mod"},
+					{"key": "k2", "value": "val2"}
+				],
+				
+				"subdoc": {
+					"values": [1, 2, 3],
+					"date": "05/10/2021"
+				}
+			};
 			
-			assertEquals(docs, expectedLst);
+			db.MJS_TEST1.update({"name": "testName", "list.key": "k1"}, {"$set": {"list.$.value": "val1-mod"}});
+			
+			var doc = db.MJS_TEST1.findOne({"name": "testName"});
+			doc = docToMap(doc);
+			deleteProperty(doc, "_id");
+			
+			assertEquals(doc, docPostUpdate);
+		]]></test-script>
+
+	</script-bean>
+
+	<script-bean name="findWithProjection">
+		<test-script><![CDATA[
+			var docPostUpdate = {
+				"name": "testName",
+				age: 100,
+				
+				"list": [
+					{"key": "k1", "value": "val1-mod"},
+				]
+			};
+			
+			var doc = db.MJS_TEST1.findOne(
+				{"name": "testName"}, 
+				{
+					"name": 1, 
+					"age": 1, 
+					"list": {"$elemMatch": {"key": "k1"}}
+				});
+			doc = docToMap(doc);
+			deleteProperty(doc, "_id");
+			
+			assertEquals(doc, docPostUpdate);
+		]]></test-script>
+
+	</script-bean>
+
+	<script-bean name="deleteAndCount">
+		<test-script><![CDATA[
+			var count = db.MJS_TEST1.count({});
+			assertEquals(count, NumberLong(1));
+			
+			db.MJS_TEST1.deleteOne({"name": "testName"});
+
+			count = db.MJS_TEST1.count({});
+			assertEquals(count, NumberLong(0));
+		]]></test-script>
+	</script-bean>
+
+	<script-bean name="insertMany">
+		<test-script><![CDATA[
+			db.MJS_TEST1.insertMany([
+				{"key": "k1", "value": 1},
+				{"key": "k2", "value": 2},
+				{"key": "k3", "value": 3},
+				{"key": "k4", "value": 4}
+			]);
+			
+			var count = db.MJS_TEST1.count({});
+			assertEquals(count, NumberLong(4));
+		]]></test-script>
+	</script-bean>
+
+	<script-bean name="updateMany">
+		<test-script><![CDATA[
+			db.MJS_TEST1.update({}, {"$set": {"val2": 1}}, {"multi": true});
+			
+			var docs = db.MJS_TEST1.find({});
+			var newDocs = [];
+			
+			for(var i = 0; i < docs.length; i++)
+			{
+				var newDoc = docToMap(docs[i]);
+				deleteProperty(newDoc, "_id");
+				
+				newDocs.push(newDoc);
+			}
+			
+			var expectedDocs = [
+				{"key": "k1", "value": 1, "val2": 1},
+				{"key": "k2", "value": 2, "val2": 1},
+				{"key": "k3", "value": 3, "val2": 1},
+				{"key": "k4", "value": 4, "val2": 1}
+			];
+			
+			assertEquals(newDocs, expectedDocs);
+		]]></test-script>
+	</script-bean>
+
+	<script-bean name="forEach">
+		<test-script><![CDATA[
+			db.MJS_TEST1.find({}).forEach(function(doc){
+				db.MJS_TEST1.update(
+					{"_id": doc["_id"]}, 
+					{"$set": {"value": NumberInt(doc.value + 10)}}
+				);
+			});
+		
+			var docs = db.MJS_TEST1.find({});
+			var newDocs = [];
+			
+			for(var i = 0; i < docs.length; i++)
+			{
+				var newDoc = docToMap(docs[i]);
+				deleteProperty(newDoc, "_id");
+				
+				newDocs.push(newDoc);
+			}
+			
+			var expectedDocs = [
+				{"key": "k1", "value": 11, "val2": 1},
+				{"key": "k2", "value": 12, "val2": 1},
+				{"key": "k3", "value": 13, "val2": 1},
+				{"key": "k4", "value": 14, "val2": 1}
+			];
+			
+			assertEquals(newDocs, expectedDocs);
+		]]></test-script>
+	</script-bean>
+
+	<script-bean name="fetchId">
+		<test-script><![CDATA[
+			var idByFunc = fetchId('MJS_TEST1', 'key', 'k1');
+			var doc = db.MJS_TEST1.findOne({"_id": ObjectId(idByFunc)});
+			
+			assertEquals(doc["key"], "k1");
 		]]></test-script>
 	</script-bean>
 </test-data>
