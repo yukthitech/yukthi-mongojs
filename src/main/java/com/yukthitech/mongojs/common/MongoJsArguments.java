@@ -18,7 +18,7 @@ public class MongoJsArguments
 	/**
 	 * Default database to be used.
 	 */
-	@CliArgument(name = "db", longName = "database", description = "Default database to be used", required = false)
+	@CliArgument(name = "db", longName = "database", description = "Default database to be used", required = true)
 	private String dbname;
 
 	/**
@@ -39,6 +39,13 @@ public class MongoJsArguments
 	@CliArgument(name = "ssl", longName = "enable-ssl", 
 			description = "If true, then it will indicate the db connectivity should happen via SSL. Default: false", required = false)
 	private boolean enableSsl = false;
+
+	/**
+	 * The file.
+	 */
+	@CliArgument(name = "fie", longName = "file", 
+			description = "File to be executed", required = true)
+	private String file;
 
 	/**
 	 * Gets the default database to be used.
@@ -146,5 +153,26 @@ public class MongoJsArguments
 	public void setEnableSsl(boolean enableSsl)
 	{
 		this.enableSsl = enableSsl;
+	}
+
+	/**
+	 * Gets the file.
+	 *
+	 * @return the file
+	 */
+	public String getFile()
+	{
+		return file;
+	}
+
+	/**
+	 * Sets the file.
+	 *
+	 * @param file
+	 *            the new file
+	 */
+	public void setFile(String file)
+	{
+		this.file = file;
 	}
 }

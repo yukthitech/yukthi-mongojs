@@ -1,5 +1,7 @@
 package com.yukthitech.mongojs;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 import org.bson.Document;
@@ -14,6 +16,10 @@ import com.yukthitech.utils.CommonUtils;
 public class MongoMethods
 {
 	public static ObjectMapper OBJ_MAPPER = new ObjectMapper();
+	
+	private static final String ISO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+	
+	private static final String DEF_DATE_FORMAT = "yyyy-MM-dd";
 
 	public static ObjectId ObjectId(String id)
 	{
@@ -75,5 +81,22 @@ public class MongoMethods
 		}
 		
 		return doc.get("_id").toString();
+	}
+	
+	public static Date ISODate(String dateStr) throws Exception
+	{
+		SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_DATE_FORMAT);
+		return dateFormat.parse(dateStr);
+	}
+
+	public static Date date(String dateStr) throws Exception
+	{
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DEF_DATE_FORMAT);
+		return dateFormat.parse(dateStr);
+	}
+	
+	public static Date now()
+	{
+		return new Date();
 	}
 }

@@ -1,7 +1,9 @@
 package com.yukthitech.mongojs;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.io.File;
+import java.nio.charset.Charset;
+
+import org.apache.commons.io.FileUtils;
 
 import com.yukthitech.mongojs.common.MongoJsArguments;
 import com.yukthitech.utils.cli.CommandLineOptions;
@@ -9,14 +11,12 @@ import com.yukthitech.utils.cli.MissingArgumentException;
 import com.yukthitech.utils.cli.OptionsFactory;
 
 /**
- * Main class which would do the db versioing.
+ * Main class which can be used to execute script files from command line.
  * @author akiran
  */
-public class Main
+public class ScriptExecutor
 {
-	private static Logger logger = LogManager.getLogger(Main.class);
-	
-	private static final String COMMAND_SYNTAX = String.format("java %s args...", Main.class.getName());
+	private static final String COMMAND_SYNTAX = String.format("java %s args...", ScriptExecutor.class.getName());
 	
 	/**
 	 * Parses and load command line arguments into {@link MongoJsArguments}
@@ -50,15 +50,19 @@ public class Main
 		return basicArguments;
 	}
 	
-	public static int execute(String[] args)
+	public static void execute(String[] args) throws Exception
 	{
 		MongoJsArguments argumentBean = loadArguments(args);
-		return 0;
+		MongoJsEngine mongoJsEngine = new MongoJsEngine(argumentBean);
+		
+		String script = FileUtils.readFileToString(new File(argumentBean.getFile()), Charset.defaultCharset());
+		
+		mongoJsEngine.executeScript(script);
 	}
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
-		int exitCode = execute(args);
-		System.exit(exitCode);
+		execute(args);
+		System.exit(0);
 	}
 }

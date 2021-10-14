@@ -21,7 +21,8 @@ public class JsMethodWrapper implements JsMethod
 		this.actualMethod = actualMethod;
 		this.database = database;
 		
-		needDbArg = actualMethod.getParameterTypes()[0].equals(JsMongoDatabase.class);
+		Class<?> paramTypes[] = actualMethod.getParameterTypes(); 
+		needDbArg = paramTypes.length > 0 ? paramTypes[0].equals(JsMongoDatabase.class) : false;
 	}
 	
 	@Override
