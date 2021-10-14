@@ -8,77 +8,65 @@ As of version 0.1 most of read and DML query flavors are supported. DDL is not y
 
 * **insert(docToInsert)** - Insert the document into target collection.
     * *Example*: db.getCollection("MJS_TEST1").insert({"key": "k1", "value": 1})
-    *   
 
 * **insertMany(docList)** - Insert multiple document into target collection.
-    * *Example*: ```javascript
+    * *Example*: 
+       ```javascript
     		db.MJS_TEST1.insertMany([  
-				{"key": "k1", "value": 1},  
-				{"key": "k2", "value": 2},  
-				{"key": "k3", "value": 3},  
-				{"key": "k4", "value": 4}  
-			])```
-    *   
-
+			{"key": "k1", "value": 1},  
+			{"key": "k2", "value": 2},  
+			{"key": "k3", "value": 3},  
+			{"key": "k4", "value": 4}  
+		])
+       ```
+	
 * **update(filter, updates)** - To update single document specified by filter.
     * *Example*: 
     	```javascript
-	    	db.MJS_TEST1.update(  
-		    {"name": "testName", "list.key": "k1"},  
-		    {"$set": {"list.$.value": "val1-mod"}}  
-		    )
-		```
-    *   
-
+		db.MJS_TEST1.update(  
+			{"name": "testName", "list.key": "k1"},  
+			{"$set": {"list.$.value": "val1-mod"}}  
+		)
+	```
 * **update(filter, updates, options)** - To update document(s) specified by filter along with options. Supported options - multi, upsert
     * *Example*: 
-    ```javascript
-    		db.MJS_TEST1.update(  
-		    {},  
-		    {"$set": {"val2": 1}}, {"multi": true}  
-		    )
-	 ```
-    *   
-
+ 	```javascript
+		db.MJS_TEST1.update(  
+			{},  
+			{"$set": {"val2": 1}}, {"multi": true}  
+		)
+	```
 * **deleteOne(filter)** - Deletes single document specified by filter.
     * *Example*: db.MJS_TEST1.deleteOne({"name": "testName"})
-    *   
-    
 * **deleteMany(filter)** - Deletes all matching document(s) specified by filter.
     * *Example*: db.MJS_TEST1.deleteMany({})
-    *   
-
 * **findOne(filter)** - Fetches first document specified by filter.
     * *Example*: db.MJS_TEST1.findOne({"name": "testName"})
-    *   
 * **findeOne(filter, projection)** - Fetches first document specified by filter and projection.
     * *Example*: 
-    	```javascript
-    			db.MJS_TEST1.findOne(  
-				{"name": "testName"},  
-				{  
-					"name": 1,  
-					"age": 1,  
-					"list": {"$elemMatch": {"key": "k1"}}  
-				})
-		```
-    *   
+	```javascript
+		db.MJS_TEST1.findOne(  
+			{"name": "testName"},  
+			{  
+				"name": 1,  
+				"age": 1,  
+				"list": {"$elemMatch": {"key": "k1"}}  
+			})
+	```
 * **find(filter)** - Fetches all documents specified by filter.
     * *Example*: db.MJS_TEST1.find({})
-    *   
 * **find(filter, projection)** - Fetches all documents specified by filter and projection.
     * *Example*: 
     	```javascript
-    			db.MJS_TEST1.findOne(  
-				{},  
-				{  
-					"name": 1,  
-					"age": 1,  
-					"list": {"$elemMatch": {"key": "k1"}}  
-				})
-		```
-    *   
-       
+    		db.MJS_TEST1.findOne(  
+			{},  
+			{  
+				"name": 1,  
+				"age": 1,  
+				"list": {"$elemMatch": {"key": "k1"}}  
+			}
+		)
+	```
 **For Each document flow**
 The find() query results can be extended to process the document using javascript as shown below:  
 ```javascript
