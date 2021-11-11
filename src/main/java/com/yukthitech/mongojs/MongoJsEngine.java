@@ -3,10 +3,14 @@ package com.yukthitech.mongojs;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -35,22 +39,17 @@ public class MongoJsEngine
 	private static final Pattern HOST_PORT = Pattern.compile("([\\w\\.\\-]+)\\:(\\d+)");
 
 	/**
-	 * Mongo client connection.
-	 */
-	private MongoClient mongoClient;
-	
-	/**
 	 * Database on which operations needs to be performed.
 	 */
 	private MongoDatabase database;
 	
 	private JsMongoDatabase mongoDb;
 	
-	/**
-	 * Nahron Engine to execute java-script.
-	 */
 	private ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 	
+	private Map<String, Object> defaultBindings = new HashMap<String, Object>();
+	
+	@SuppressWarnings("resource")
 	public MongoJsEngine(MongoJsArguments args)
 	{
 		String user = args.getUserName();
@@ -68,22 +67,33 @@ public class MongoJsEngine
 				.sslEnabled(args.isEnableSsl())
 				.build();
 				
+		MongoClient mongoClient = null;
+		
 		if(credential != null)
 		{
-			this.mongoClient = new MongoClient(mongoHosts, credential, clientOptions);
+			mongoClient = new MongoClient(mongoHosts, credential, clientOptions);
 		}
 		else
 		{
-			this.mongoClient = new MongoClient(mongoHosts, clientOptions);
+			mongoClient = new MongoClient(mongoHosts, clientOptions);
 		}
 		
-		this.database = mongoClient.getDatabase(database);
+		this.setDb(mongoClient.getDatabase(database));
+		logger.debug("Connected to mongocluster {} successfully", replicas);
+	}
+	
+	public MongoJsEngine(MongoDatabase mongoDatabase)
+	{
+		this.setDb(mongoDatabase);
+	}
+	
+	private void setDb(MongoDatabase database)
+	{
+		this.database = database;
 		this.mongoDb = new JsMongoDatabase(this.database);
 		
 		loadClassMethods(MongoMethods.class);
-		this.engine.put("db", mongoDb);
-		
-		logger.debug("Connected to mongocluster {} successfully", replicas);
+		this.defaultBindings.put("db", mongoDb);
 	}
 	
 	public void loadClassMethods(Class<?> cls)
@@ -125,7 +135,7 @@ public class MongoJsEngine
 	{
 		logger.trace("Registering method {}.{}() as {}", method.getClass().getName(), method.getName(), name);
 		
-		this.engine.put(name, new JsMethodWrapper(method, this.mongoDb));
+		this.defaultBindings.put(name, new JsMethodWrapper(method, this.mongoDb));
 	}
 
 	/**
@@ -143,6 +153,10 @@ public class MongoJsEngine
 		
 		try
 		{
+			Bindings bindings = engine.createBindings();
+			bindings.putAll(this.defaultBindings);
+			
+			engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 			engine.eval(script);
 		}catch(Exception ex)
 		{
