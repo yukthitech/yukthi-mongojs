@@ -13,27 +13,44 @@ public class MongoJsUtils
 	@SuppressWarnings("unchecked")
 	public static Object unwrapObject(Object input)
 	{
-		if(!(input instanceof JSObject))
+		//if non nashron object is specified there is nothing to unwrap
+		if(input == null || !input.getClass().getName().startsWith("jdk.nashorn"))
 		{
 			return input;
 		}
 		
-		JSObject jsObj = (JSObject) input;
+		if(input instanceof JSObject)
+		{
+			JSObject jsObj = (JSObject) input;
+			
+			if(jsObj.isArray())
+			{
+				List<Object> res = new LinkedList<Object>();
+				Map<Object, Object> inputMap = (Map<Object, Object>) input;
+				int size = inputMap.size();
+				
+				for(int i = 0; i < size; i++)
+				{
+					res.add(unwrapObject(inputMap.get("" + i)));
+				}
+				
+				return res;
+			}
+		}
 		
-		if(jsObj.isArray())
+		if(input instanceof List)
 		{
 			List<Object> res = new LinkedList<Object>();
-			Map<Object, Object> inputMap = (Map<Object, Object>) input;
-			int size = inputMap.size();
+			List<Object> inputLst = (List<Object>) input;
 			
-			for(int i = 0; i < size; i++)
+			for(Object obj : inputLst)
 			{
-				res.add(unwrapObject(inputMap.get("" + i)));
+				res.add(unwrapObject(obj));
 			}
 			
 			return res;
 		}
-
+		
 		if(input instanceof Map)
 		{
 			Map<Object, Object> res = new LinkedHashMap<Object, Object>();

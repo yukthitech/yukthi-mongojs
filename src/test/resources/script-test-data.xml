@@ -105,10 +105,10 @@
 	<script-bean name="insertMany">
 		<test-script><![CDATA[
 			db.MJS_TEST1.insertMany([
-				{"key": "k1", "value": 1},
-				{"key": "k2", "value": 2},
-				{"key": "k3", "value": 3},
-				{"key": "k4", "value": 4}
+				{"key": "k1", "value": 1, "locales": [{"name": "a"}, {"name": "b"}]},
+				{"key": "k2", "value": 2, "locales": [{"name": "c"}, {"name": "f"}]},
+				{"key": "k3", "value": 3, "locales": [{"name": "d"}, {"name": "g"}]},
+				{"key": "k4", "value": 4, "locales": [{"name": "e"}, {"name": "h"}]}
 			]);
 			
 			var count = db.MJS_TEST1.count({});
@@ -132,10 +132,10 @@
 			}
 			
 			var expectedDocs = [
-				{"key": "k1", "value": 1, "val2": 1},
-				{"key": "k2", "value": 2, "val2": 1},
-				{"key": "k3", "value": 3, "val2": 1},
-				{"key": "k4", "value": 4, "val2": 1}
+				{"key": "k1", "value": 1, "val2": 1, "locales": [{"name": "a"}, {"name": "b"}]},
+				{"key": "k2", "value": 2, "val2": 1, "locales": [{"name": "c"}, {"name": "f"}]},
+				{"key": "k3", "value": 3, "val2": 1, "locales": [{"name": "d"}, {"name": "g"}]},
+				{"key": "k4", "value": 4, "val2": 1, "locales": [{"name": "e"}, {"name": "h"}]}
 			];
 			
 			assertEquals(newDocs, expectedDocs);
@@ -163,10 +163,10 @@
 			}
 			
 			var expectedDocs = [
-				{"key": "k1", "value": 11, "val2": 1},
-				{"key": "k2", "value": 12, "val2": 1},
-				{"key": "k3", "value": 13, "val2": 1},
-				{"key": "k4", "value": 14, "val2": 1}
+				{"key": "k1", "value": 11, "val2": 1, "locales": [{"name": "a"}, {"name": "b"}]},
+				{"key": "k2", "value": 12, "val2": 1, "locales": [{"name": "c"}, {"name": "f"}]},
+				{"key": "k3", "value": 13, "val2": 1, "locales": [{"name": "d"}, {"name": "g"}]},
+				{"key": "k4", "value": 14, "val2": 1, "locales": [{"name": "e"}, {"name": "h"}]}
 			];
 			
 			assertEquals(newDocs, expectedDocs);
