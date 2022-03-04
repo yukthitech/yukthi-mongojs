@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -15,6 +17,8 @@ import com.yukthitech.utils.CommonUtils;
 
 public class MongoMethods
 {
+	private static Logger logger = LogManager.getLogger(MongoMethods.class);
+	
 	public static ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	
 	private static final String ISO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
@@ -98,5 +102,25 @@ public class MongoMethods
 	public static Date now()
 	{
 		return new Date();
+	}
+	
+	public static void print(Object... args)
+	{
+		if(args.length == 0)
+		{
+			return;
+		}
+		
+		for(int i = 0; i < args.length; i++)
+		{
+			Object val = args[i];
+			
+			if(!(val instanceof String))
+			{
+				val = toJson(val);
+			}
+			
+			logger.debug("[PRINT] {}", val);
+		}
 	}
 }

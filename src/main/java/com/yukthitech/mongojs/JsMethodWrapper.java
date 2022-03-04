@@ -1,7 +1,10 @@
 package com.yukthitech.mongojs;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.yukthitech.mongojs.db.JsMongoDatabase;
 
@@ -29,30 +32,45 @@ public class JsMethodWrapper implements JsMethod
 	public Object call(Object... args)
 	{
 		int len = needDbArg ? args.length + 1 : args.length;
-		Object array[] = new Object[len];
-		int startIdx = 0;
+		List<Object> argLst = new ArrayList<Object>(len);
 		
 		if(needDbArg)
 		{
-			array[0] = database;
-			startIdx = 1;
+			argLst.add(database);
 		}
+		
+		Parameter params[] = actualMethod.getParameters();
 		
 		for(int i = 0; i < args.length; i++)
 		{
-			array[i + startIdx] = MongoJsUtils.unwrapObject(args[i]);
+			if(!params[i].isVarArgs())
+			{
+				argLst.add(MongoJsUtils.unwrapObject(args[i]));
+				continue;
+			}
+			
+			List<Object> varArg = new ArrayList<Object>();
+			
+			for(int j = i; j < args.length; j++)
+			{
+				varArg.add(MongoJsUtils.unwrapObject(args[j]));
+			}
+
+			Object varArr[] = (Object[]) Array.newInstance(params[i].getType().getComponentType(), varArg.size());
+			argLst.add(varArg.toArray(varArr));
+			break;
 		}
 		
 		try
 		{
-			return actualMethod.invoke(null, array);
+			return actualMethod.invoke(null, argLst.toArray());
 		} catch(Exception ex)
 		{
 			throw new IllegalStateException(String.format(
 					"Method invocation resulted in error.\nMethod: %s.%s()\nArguments: %s",
 					actualMethod.getDeclaringClass().getName(),
 					actualMethod.getName(),
-					Arrays.toString(array)
+					argLst
 					), ex);
 		}
 	}

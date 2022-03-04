@@ -32,6 +32,7 @@
 			deleteProperty(doc, "_id");
 			
 			assertEquals(doc, docToInsert);
+			print("Completed insert.");
 		]]></test-script>
 
 	</script-bean>
@@ -58,6 +59,8 @@
 			var doc = db.MJS_TEST1.findOne({"name": "testName"});
 			doc = docToMap(doc);
 			deleteProperty(doc, "_id");
+			
+			print("Doc: ", doc);
 			
 			assertEquals(doc, docPostUpdate);
 		]]></test-script>
