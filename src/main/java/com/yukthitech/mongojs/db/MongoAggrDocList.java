@@ -4,21 +4,19 @@ import java.lang.reflect.Method;
 import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.bson.Document;
 
-import com.mongodb.client.FindIterable;
-import com.yukthitech.mongojs.MongoJsUtils;
+import com.mongodb.client.AggregateIterable;
 import com.yukthitech.utils.exceptions.InvalidStateException;
 
-public class MongoDocList extends AbstractList<Document>
+public class MongoAggrDocList extends AbstractList<Document>
 {
-	private FindIterable<Document> documentIt;
+	private AggregateIterable<Document> documentIt;
 	
 	private List<Document> listView;
 	
-	public MongoDocList(FindIterable<Document> documentIt)
+	public MongoAggrDocList(AggregateIterable<Document> documentIt)
 	{
 		this.documentIt = documentIt;
 	}
@@ -37,21 +35,6 @@ public class MongoDocList extends AbstractList<Document>
 		{
 			throw new InvalidStateException("An error occurred while invoking callback", ex);
 		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	public MongoDocList sort(Map<String, Object> criteria)
-	{
-		criteria = (Map<String, Object>) MongoJsUtils.unwrapObject(criteria);
-		documentIt.sort(new Document(criteria));
-		
-		return this;
-	}
-	
-	public MongoDocList limit(int limit)
-	{
-		documentIt.limit(limit);
-		return this;
 	}
 	
 	public Document first()

@@ -41,7 +41,7 @@ public class TestMongoJsEngine
 	}
 
 	@Test(dataProvider =  "jsonElDataProvider")
-	public void testJel(ScriptBean bean) throws Exception
+	public void testMongoJs(ScriptBean bean) throws Exception
 	{
 		mongoJsEngine.executeScript(bean.getTestScript());
 	}

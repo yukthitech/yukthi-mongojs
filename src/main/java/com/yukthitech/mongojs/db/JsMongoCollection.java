@@ -111,14 +111,7 @@ public class JsMongoCollection
 			resIt.projection(new Document(projection));
 		}
 		
-		MongoDocList resLst = new MongoDocList();
-		
-		for(Document res : resIt)
-		{
-			resLst.add(res);
-		}
-		
-		return resLst;
+		return new MongoDocList(resIt);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -135,14 +128,7 @@ public class JsMongoCollection
 		
 		AggregateIterable<Document> resIt = collection.aggregate(pipelineDocs);
 		
-		MongoDocList resLst = new MongoDocList();
-		
-		for(Document res : resIt)
-		{
-			resLst.add(res);
-		}
-		
-		return resLst;
+		return new MongoAggrDocList(resIt);
 	}
 
 	@SuppressWarnings("unchecked")
