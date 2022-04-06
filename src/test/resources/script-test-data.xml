@@ -198,6 +198,28 @@
 		]]></test-script>
 	</script-bean>
 
+	<script-bean name="hasNextAndNext">
+		<test-script><![CDATA[
+			var docs = db.MJS_TEST1.find({}).sort({"value": -1}).limit(2);
+			var newDocs = [];
+			
+			while(docs.hasNext())
+			{
+				var newDoc = docToMap(docs.next());
+				deleteProperty(newDoc, "_id");
+				
+				newDocs.push(newDoc);
+			}
+			
+			var expectedDocs = [
+				{"key": "k4", "value": 14, "val2": 1, "locales": [{"name": "e"}, {"name": "h"}]},
+				{"key": "k3", "value": 13, "val2": 1, "locales": [{"name": "d"}, {"name": "g"}]},
+			];
+			
+			assertEquals(newDocs, expectedDocs);
+		]]></test-script>
+	</script-bean>
+
 	<script-bean name="fetchId">
 		<test-script><![CDATA[
 			var idByFunc = fetchId('MJS_TEST1', 'key', 'k1');

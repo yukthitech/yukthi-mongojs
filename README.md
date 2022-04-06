@@ -55,7 +55,7 @@ As of version 0.1 most of read and DML query flavors are supported. DDL is not y
 	```
 * **find(filter)** - Fetches all documents specified by filter. This is same as calling find(filter, null).
     * *Example*: db.MJS_TEST1.find({})
-* **find(filter, projection)** - Fetches all documents specified by filter and projection. The return value is list of documents which can support sort() and limit() functions as well.
+* **find(filter, projection)** - Fetches all documents specified by filter and projection. The return value is list of documents which can support sort() and limit(), hasNext() and next() functions as well.
     * *Example - projection*: 
     	```javascript
     		db.MJS_TEST1.find(  
@@ -66,7 +66,8 @@ As of version 0.1 most of read and DML query flavors are supported. DDL is not y
 				"list": {"$elemMatch": {"key": "k1"}}  
 			}
 		)
-	```
+		```
+	
     * *Example - sort and Limit*: 
     	```javascript
     		db.MJS_TEST1.find(  
@@ -77,7 +78,25 @@ As of version 0.1 most of read and DML query flavors are supported. DDL is not y
 				"list": {"$elemMatch": {"key": "k1"}}  
 			}
 			).sort({"name": 1}).limit(2)
-	```
+		```
+	
+    * *Example - hasNext and next*: 
+    	```javascript
+    		var docs = db.MJS_TEST1.find(  
+			{},  
+			{  
+				"name": 1,  
+				"age": 1,  
+				"list": {"$elemMatch": {"key": "k1"}}  
+			}
+			).sort({"name": 1}).limit(2);
+			
+			while(docs.hasNext())
+			{
+				var newDoc = docToMap(docs.next());
+				// other code goes here
+			}
+		```
 **For Each document flow**
 The find() query results can be extended to process the document using javascript as shown below:  
 ```javascript

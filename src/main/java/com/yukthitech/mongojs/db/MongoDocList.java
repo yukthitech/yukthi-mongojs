@@ -9,6 +9,7 @@ import java.util.Map;
 import org.bson.Document;
 
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCursor;
 import com.yukthitech.mongojs.MongoJsUtils;
 import com.yukthitech.utils.exceptions.InvalidStateException;
 
@@ -17,6 +18,8 @@ public class MongoDocList extends AbstractList<Document>
 	private FindIterable<Document> documentIt;
 	
 	private List<Document> listView;
+	
+	private MongoCursor<Document> docCursor;
 	
 	public MongoDocList(FindIterable<Document> documentIt)
 	{
@@ -57,6 +60,36 @@ public class MongoDocList extends AbstractList<Document>
 	public Document first()
 	{
 		return documentIt.first();
+	}
+	
+	private MongoCursor<Document> getCursor()
+	{
+		if(this.docCursor != null)
+		{
+			return docCursor;
+		}
+		
+		return (docCursor = documentIt.cursor());
+	}
+	
+	public boolean hasNext()
+	{
+		return getCursor().hasNext();
+	}
+	
+	public Document next()
+	{
+		return getCursor().next();
+	}
+	
+	public boolean getHasNext()
+	{
+		return getCursor().hasNext();
+	}
+	
+	public Document getNext()
+	{
+		return getCursor().next();
 	}
 	
 	private List<Document> listView()
