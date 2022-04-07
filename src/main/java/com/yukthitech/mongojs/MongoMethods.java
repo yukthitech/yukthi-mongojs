@@ -123,4 +123,9 @@ public class MongoMethods
 			logger.debug("[PRINT] {}", val);
 		}
 	}
+	
+	public static Object unwrap(Object object)
+	{
+		return MongoJsUtils.unwrapObject(object);
+	}
 }

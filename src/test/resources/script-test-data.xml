@@ -194,6 +194,8 @@
 				{"key": "k3", "value": 13, "val2": 1, "locales": [{"name": "d"}, {"name": "g"}]},
 			];
 			
+			print("Test: ", unwrap(expectedDocs));
+			
 			assertEquals(newDocs, expectedDocs);
 		]]></test-script>
 	</script-bean>

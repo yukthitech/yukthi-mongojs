@@ -123,6 +123,7 @@ now()                                                                           
 String fetchId(JsMongoDatabase mongoDb, String collectionName, String fld, Object value)  | A utility function to get _id field value from specified collection, with specified field and field-value combination.
 void deleteProperty(Map<String, Object> obj, String attrName)                             | "delete" of standard javascript may not work in this scripts. In such cases, this function can be used to remove "attrName" from "obj" map.
 void print(Object... args)                             									  | Prints as a log statement. Every arg is printed in new line. If non-string arg is specified, it will be printed in json format.
+Object unwrap(Object value)                             								  | Objects or Lists created in JS are not compatible with java methods. This is taken when global methods are called. For object methods this unwrap() needs to be called explicitly.
 
 
 
