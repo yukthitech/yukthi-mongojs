@@ -31,6 +31,7 @@ public class JsMethodWrapper implements JsMethod
 	@Override
 	public Object call(Object... args)
 	{
+		args = (args == null) ? new Object[0] : args;
 		int len = needDbArg ? args.length + 1 : args.length;
 		List<Object> argLst = new ArrayList<Object>(len);
 		

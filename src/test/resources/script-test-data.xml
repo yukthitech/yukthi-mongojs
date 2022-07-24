@@ -4,7 +4,7 @@
 	<mongoJsArguments
 		replicas="localhost:27017"
 		dbname="test"
-	/>
+	></mongoJsArguments>
 	
 	<script-bean name="insert">
 		<test-script><![CDATA[
@@ -33,10 +33,12 @@
 			
 			assertEquals(doc, docToInsert);
 			print("Completed insert.");
+			print(doc.name);
 		]]></test-script>
 
 	</script-bean>
 
+	<!--  -->
 	<script-bean name="update">
 		<test-script><![CDATA[
 			var docPostUpdate = {

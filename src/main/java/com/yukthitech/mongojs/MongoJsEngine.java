@@ -37,6 +37,15 @@ public class MongoJsEngine
 	 * The Constant HOST_PORT.
 	 */
 	private static final Pattern HOST_PORT = Pattern.compile("([\\w\\.\\-]+)\\:(\\d+)");
+	
+	/**
+	 * Used to maintain current js engine during script execution.
+	 */
+	private static ThreadLocal<MongoJsEngine> currentEngine = new ThreadLocal<MongoJsEngine>();
+	
+	private static final IMongoJsCustomizer DEFAULT_CUSTOMIZER = new IMongoJsCustomizer()
+	{
+	};
 
 	/**
 	 * Database on which operations needs to be performed.
@@ -48,6 +57,11 @@ public class MongoJsEngine
 	private ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 	
 	private Map<String, Object> defaultBindings = new HashMap<String, Object>();
+	
+	/**
+	 * Customizer for this engine.
+	 */
+	private IMongoJsCustomizer customizer = DEFAULT_CUSTOMIZER;
 	
 	@SuppressWarnings("resource")
 	public MongoJsEngine(MongoJsArguments args)
@@ -85,6 +99,31 @@ public class MongoJsEngine
 	public MongoJsEngine(MongoDatabase mongoDatabase)
 	{
 		this.setDb(mongoDatabase);
+	}
+	
+	/**
+	 * Sets the customizer for this engine. If null is specified, default customizer will be used.
+	 *
+	 * @param customizer the new customizer for this engine
+	 */
+	public void setCustomizer(IMongoJsCustomizer customizer)
+	{
+		if(customizer == null)
+		{
+			customizer = DEFAULT_CUSTOMIZER;
+		}
+		
+		this.customizer = customizer;
+	}
+	
+	/**
+	 * Gets the customizer for this engine.
+	 *
+	 * @return the customizer for this engine
+	 */
+	public IMongoJsCustomizer getCustomizer()
+	{
+		return customizer;
 	}
 	
 	private void setDb(MongoDatabase database)
@@ -137,6 +176,11 @@ public class MongoJsEngine
 		
 		this.defaultBindings.put(name, new JsMethodWrapper(method, this.mongoDb));
 	}
+	
+	public static MongoJsEngine getCurrentEngine()
+	{
+		return currentEngine.get();
+	}
 
 	/**
 	 * Executes specified script. 
@@ -144,12 +188,14 @@ public class MongoJsEngine
 	 * @param script
 	 * @param paramMap
 	 */
-	public void executeScript(String script)
+	public Object executeScript(String script)
 	{
 		if(StringUtils.isBlank(script))
 		{
 			throw new NullPointerException("Script is null or empty");
 		}
+		
+		currentEngine.set(this);
 		
 		try
 		{
@@ -157,10 +203,13 @@ public class MongoJsEngine
 			bindings.putAll(this.defaultBindings);
 			
 			engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-			engine.eval(script);
-		}catch(Exception ex)
+			return MongoJsUtils.unwrapObject(engine.eval(script));
+		} catch(Exception ex)
 		{
 			throw new InvalidStateException("An error occurred while executing below script:\n{}", script, ex);
+		} finally
+		{
+			currentEngine.remove();
 		}
 	}
 }

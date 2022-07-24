@@ -111,6 +111,8 @@ public class MongoMethods
 			return;
 		}
 		
+		StringBuilder builder = new StringBuilder();
+		
 		for(int i = 0; i < args.length; i++)
 		{
 			Object val = args[i];
@@ -120,8 +122,18 @@ public class MongoMethods
 				val = toJson(val);
 			}
 			
-			logger.debug("[PRINT] {}", val);
+			builder.append(val);
 		}
+		
+		IMongoJsCustomizer customizer = MongoJsEngine.getCurrentEngine().getCustomizer();
+		String finalMssg = builder.toString();
+		
+		if(customizer.printLog(finalMssg))
+		{
+			return;
+		}
+		
+		logger.debug("[PRINT] {}", finalMssg);
 	}
 	
 	public static Object unwrap(Object object)
