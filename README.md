@@ -40,6 +40,8 @@ As of version 0.1 most of read and DML query flavors are supported. DDL is not y
     * *Example*: db.MJS_TEST1.deleteOne({"name": "testName"})
 * **deleteMany(filter)** - Deletes all matching document(s) specified by filter.
     * *Example*: db.MJS_TEST1.deleteMany({})
+* **count(filter)** - Fetches the number of documents in the collection matching with specified filter.
+    * *Example*: db.MJS_TEST1.count({})
 * **findOne(filter)** - Fetches first document specified by filter.
     * *Example*: db.MJS_TEST1.findOne({"name": "testName"})
 * **findeOne(filter, projection)** - Fetches first document specified by filter and projection.
