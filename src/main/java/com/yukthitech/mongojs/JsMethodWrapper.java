@@ -6,10 +6,15 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.yukthitech.mongojs.db.JsMongoDatabase;
 
 public class JsMethodWrapper implements JsMethod
 {
+	private static Logger logger = LogManager.getLogger(JsMethodWrapper.class);
+	
 	/**
 	 * Actual method to be invoked.
 	 */
@@ -67,12 +72,16 @@ public class JsMethodWrapper implements JsMethod
 			return actualMethod.invoke(null, argLst.toArray());
 		} catch(Exception ex)
 		{
+			logger.error("Method invocation resulted in error.\nMethod: {}.{}()\nArguments: {}", actualMethod.getDeclaringClass().getName(),
+					actualMethod.getName(),
+					argLst,
+					ex);
 			throw new IllegalStateException(String.format(
-					"Method invocation resulted in error.\nMethod: %s.%s()\nArguments: %s",
+					"Method invocation resulted in error.\nMethod: %s.%s()\nArguments: %s\nError: %s",
 					actualMethod.getDeclaringClass().getName(),
 					actualMethod.getName(),
-					argLst
-					), ex);
+					argLst,
+					ex), ex);
 		}
 	}
 }

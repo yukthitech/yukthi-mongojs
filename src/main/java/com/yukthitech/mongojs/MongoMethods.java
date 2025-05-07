@@ -1,6 +1,7 @@
 package com.yukthitech.mongojs;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -102,6 +103,11 @@ public class MongoMethods
 	public static Date now()
 	{
 		return new Date();
+	}
+	
+	public static WrapperList<Object> toWrapperList(Object... args)
+	{
+		return new WrapperList<>(Arrays.asList(args));
 	}
 	
 	public static void print(Object... args)

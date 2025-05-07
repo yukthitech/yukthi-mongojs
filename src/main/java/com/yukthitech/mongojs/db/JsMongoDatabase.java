@@ -29,6 +29,19 @@ public class JsMongoDatabase extends AbstractMap<String, JsMongoCollection>
 	{
 		return database.getCollection(name);
 	}
+	
+	@Override
+	public boolean containsKey(Object key)
+	{
+		try
+		{
+			MongoCollection<Document> collection = database.getCollection("" + key);
+			return (collection != null);
+		}catch(Exception ex)
+		{
+			return false;
+		}
+	}
 
 	@Override
 	public Set<Entry<String, JsMongoCollection>> entrySet()

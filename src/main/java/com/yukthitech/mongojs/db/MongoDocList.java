@@ -1,12 +1,12 @@
 package com.yukthitech.mongojs.db;
 
-import java.lang.reflect.Method;
 import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.bson.Document;
+import org.graalvm.polyglot.Value;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
@@ -26,19 +26,17 @@ public class MongoDocList extends AbstractList<Document>
 		this.documentIt = documentIt;
 	}
 
-	public void forEach(Object callback)
+	public void forEach(Value callback)
 	{
 		try
 		{
-			Method method = callback.getClass().getMethod("call", Object.class, Object[].class);
-			
 			for(Document doc : documentIt)
 			{
-				method.invoke(method, doc, doc);
+				callback.execute(doc);
 			}
 		}catch(Exception ex)
 		{
-			throw new InvalidStateException("An error occurred while invoking callback", ex);
+			throw new InvalidStateException("An error occurred while invoking callback. Error: " + ex, ex);
 		}
 	}
 	

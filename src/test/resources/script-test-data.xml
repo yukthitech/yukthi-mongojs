@@ -196,7 +196,7 @@
 				{"key": "k3", "value": 13, "val2": 1, "locales": [{"name": "d"}, {"name": "g"}]},
 			];
 			
-			print("Test: ", unwrap(expectedDocs));
+			print("Test: ", unwrap(toWrapperList(expectedDocs)));
 			
 			assertEquals(newDocs, expectedDocs);
 		]]></test-script>

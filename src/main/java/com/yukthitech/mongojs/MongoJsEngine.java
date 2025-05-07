@@ -9,14 +9,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Value;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -54,7 +51,8 @@ public class MongoJsEngine
 	
 	private JsMongoDatabase mongoDb;
 	
-	private ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+	private Context jsContext;
+	
 	
 	private Map<String, Object> defaultBindings = new HashMap<String, Object>();
 	
@@ -66,6 +64,13 @@ public class MongoJsEngine
 	@SuppressWarnings("resource")
 	public MongoJsEngine(MongoJsArguments args)
 	{
+		jsContext = Context.newBuilder("js").allowAllAccess(true).build();
+		
+		if(jsContext == null)
+		{
+			throw new IllegalStateException("Failed to create js engine");
+		}
+		
 		String user = args.getUserName();
 		String password = args.getPassword();
 		String database = args.getDbname();
@@ -199,11 +204,14 @@ public class MongoJsEngine
 		
 		try
 		{
-			Bindings bindings = engine.createBindings();
-			bindings.putAll(this.defaultBindings);
+			Value bindings = jsContext.getBindings("js");
 			
-			engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-			return MongoJsUtils.unwrapObject(engine.eval(script));
+			for(Map.Entry<String, Object> entry : this.defaultBindings.entrySet())
+			{
+				bindings.putMember(entry.getKey(), entry.getValue());
+			}
+
+			return MongoJsUtils.unwrapObject(jsContext.eval("js", script));
 		} catch(Exception ex)
 		{
 			throw new InvalidStateException("An error occurred while executing below script:\n{}", script, ex);

@@ -8,7 +8,7 @@ import com.yukthitech.ccg.xml.XMLBeanParser;
 
 public class TestMongoJsEngine
 {
-	private MongoJsEngine mongoJsEngine;
+	private String jsEngineNames[] = {"graal.js"};
 	
 	private Object[][] loadXmlFile(String file) throws Exception
 	{
@@ -18,14 +18,19 @@ public class TestMongoJsEngine
 		int size = beans.getScripBeans().size();
 		Object[][] rows = new Object[size][];
 		
-		for(int i = 0; i < size; i++)
+		for(String engineName : jsEngineNames)
 		{
-			rows[i] = new Object[] {beans.getScripBeans().get(i)};
+			beans.getMongoJsArguments().setJsEngine(engineName);
+
+			MongoJsEngine mongoJsEngine = new MongoJsEngine(beans.getMongoJsArguments());
+			mongoJsEngine.loadClassMethods(getClass());
+			
+			for(int i = 0; i < size; i++)
+			{
+				rows[i] = new Object[] {beans.getScripBeans().get(i), mongoJsEngine};
+			}
 		}
 	
-		this.mongoJsEngine = new MongoJsEngine(beans.getMongoJsArguments());
-		
-		this.mongoJsEngine.loadClassMethods(getClass());
 		return rows;
 	}
 	
@@ -41,7 +46,7 @@ public class TestMongoJsEngine
 	}
 
 	@Test(dataProvider =  "jsonElDataProvider")
-	public void testMongoJs(ScriptBean bean) throws Exception
+	public void testMongoJs(ScriptBean bean, MongoJsEngine mongoJsEngine) throws Exception
 	{
 		mongoJsEngine.executeScript(bean.getTestScript());
 	}

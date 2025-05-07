@@ -5,20 +5,30 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import jdk.nashorn.api.scripting.JSObject;
-
-@SuppressWarnings("restriction")
 public class MongoJsUtils
 {
 	@SuppressWarnings("unchecked")
 	public static Object unwrapObject(Object input)
 	{
-		//if non nashron object is specified there is nothing to unwrap
-		if(input == null || !input.getClass().getName().startsWith("jdk.nashorn"))
+		if(input == null 
+				|| (!input.getClass().getName().startsWith("com.oracle.truffle.polyglot") 
+						&& !(input instanceof WrapperList)))
 		{
 			return input;
 		}
-		
+
+		if(input instanceof WrapperList)
+		{
+			input = ((WrapperList<Object>) input).getObjects();
+		}
+
+		/*
+		//if non nashron object is specified there is nothing to unwrap
+		if(input == null || !input.getClass().getName().startsWith("com.oracle.truffle.polyglot"))
+		{
+			return input;
+		}
+
 		if(input instanceof JSObject)
 		{
 			JSObject jsObj = (JSObject) input;
@@ -37,6 +47,7 @@ public class MongoJsUtils
 				return res;
 			}
 		}
+		*/
 		
 		if(input instanceof List)
 		{

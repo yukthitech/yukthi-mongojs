@@ -48,6 +48,13 @@ public class MongoJsArguments
 	private String file;
 
 	/**
+	 * JS engine to be used.
+	 */
+	@CliArgument(name = "je", longName = "js-engine", 
+			description = "Js engine to be used. Default: graal.js", required = false)
+	private String jsEngine = "graal.js";
+
+	/**
 	 * Gets the default database to be used.
 	 *
 	 * @return the default database to be used
@@ -174,5 +181,25 @@ public class MongoJsArguments
 	public void setFile(String file)
 	{
 		this.file = file;
+	}
+
+	/**
+	 * Gets the jS engine to be used.
+	 *
+	 * @return the jS engine to be used
+	 */
+	public String getJsEngine()
+	{
+		return jsEngine;
+	}
+
+	/**
+	 * Sets the jS engine to be used.
+	 *
+	 * @param jsEngine the new jS engine to be used
+	 */
+	public void setJsEngine(String jsEngine)
+	{
+		this.jsEngine = jsEngine;
 	}
 }
