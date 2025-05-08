@@ -8,8 +8,6 @@ import com.yukthitech.ccg.xml.XMLBeanParser;
 
 public class TestMongoJsEngine
 {
-	private String jsEngineNames[] = {"graal.js"};
-	
 	private Object[][] loadXmlFile(String file) throws Exception
 	{
 		TestConfig beans = new TestConfig();
@@ -18,17 +16,12 @@ public class TestMongoJsEngine
 		int size = beans.getScripBeans().size();
 		Object[][] rows = new Object[size][];
 		
-		for(String engineName : jsEngineNames)
+		MongoJsEngine mongoJsEngine = new MongoJsEngine(beans.getMongoJsArguments());
+		mongoJsEngine.loadClassMethods(getClass());
+		
+		for(int i = 0; i < size; i++)
 		{
-			beans.getMongoJsArguments().setJsEngine(engineName);
-
-			MongoJsEngine mongoJsEngine = new MongoJsEngine(beans.getMongoJsArguments());
-			mongoJsEngine.loadClassMethods(getClass());
-			
-			for(int i = 0; i < size; i++)
-			{
-				rows[i] = new Object[] {beans.getScripBeans().get(i), mongoJsEngine};
-			}
+			rows[i] = new Object[] {beans.getScripBeans().get(i), mongoJsEngine};
 		}
 	
 		return rows;

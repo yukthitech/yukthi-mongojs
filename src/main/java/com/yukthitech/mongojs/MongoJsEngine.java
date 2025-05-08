@@ -53,7 +53,6 @@ public class MongoJsEngine
 	
 	private Context jsContext;
 	
-	
 	private Map<String, Object> defaultBindings = new HashMap<String, Object>();
 	
 	/**
@@ -104,6 +103,7 @@ public class MongoJsEngine
 	public MongoJsEngine(MongoDatabase mongoDatabase)
 	{
 		this.setDb(mongoDatabase);
+		this.jsContext = Context.newBuilder("js").allowAllAccess(true).build();
 	}
 	
 	/**
