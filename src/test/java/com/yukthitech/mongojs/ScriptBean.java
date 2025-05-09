@@ -6,6 +6,8 @@ public class ScriptBean
 	
 	private String testScript;
 	
+	private boolean exceptionExpected;
+	
 	public String getName()
 	{
 		return name;
@@ -26,6 +28,16 @@ public class ScriptBean
 		this.testScript = testScript;
 	}
 	
+	public boolean isExceptionExpected()
+	{
+		return exceptionExpected;
+	}
+
+	public void setExceptionExpected(boolean exceptionExpected)
+	{
+		this.exceptionExpected = exceptionExpected;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

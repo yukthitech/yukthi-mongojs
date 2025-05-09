@@ -24,7 +24,6 @@ import com.mongodb.client.MongoDatabase;
 import com.yukthitech.mongojs.common.MongoJsArguments;
 import com.yukthitech.mongojs.db.JsMongoDatabase;
 import com.yukthitech.utils.exceptions.InvalidArgumentException;
-import com.yukthitech.utils.exceptions.InvalidStateException;
 
 public class MongoJsEngine
 {
@@ -214,7 +213,7 @@ public class MongoJsEngine
 			return MongoJsUtils.unwrapObject(jsContext.eval("js", script));
 		} catch(Exception ex)
 		{
-			throw new InvalidStateException("An error occurred while executing below script:\n{}", script, ex);
+			throw ScriptExecutionException.newException("An error occurred while executing below script:\n{}", script, ex);
 		} finally
 		{
 			currentEngine.remove();

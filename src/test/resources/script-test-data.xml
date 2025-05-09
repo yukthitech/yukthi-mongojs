@@ -232,4 +232,18 @@
 			assertEquals(doc["key"], "k1");
 		]]></test-script>
 	</script-bean>
+
+	<script-bean name="scriptExceptionHandling" exceptionExpected="true">
+		<test-script><![CDATA[
+			let func1 = function() {
+				throw "This is exception from js";
+			};
+			
+			let func2 = function() {
+				func1();
+			};
+			
+			func2();
+		]]></test-script>
+	</script-bean>
 </test-data>

@@ -1,11 +1,11 @@
 package com.yukthitech.mongojs.db;
 
-import java.lang.reflect.Method;
 import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bson.Document;
+import org.graalvm.polyglot.Value;
 
 import com.mongodb.client.AggregateIterable;
 import com.yukthitech.utils.exceptions.InvalidStateException;
@@ -21,15 +21,13 @@ public class MongoAggrDocList extends AbstractList<Document>
 		this.documentIt = documentIt;
 	}
 
-	public void forEach(Object callback)
+	public void forEach(Value callback)
 	{
 		try
 		{
-			Method method = callback.getClass().getMethod("call", Object.class, Object[].class);
-			
 			for(Document doc : documentIt)
 			{
-				method.invoke(method, doc, doc);
+				callback.execute(doc);
 			}
 		}catch(Exception ex)
 		{
