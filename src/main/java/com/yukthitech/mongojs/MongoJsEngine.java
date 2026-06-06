@@ -209,8 +209,9 @@ public class MongoJsEngine
 			{
 				bindings.putMember(entry.getKey(), entry.getValue());
 			}
-
-			return MongoJsUtils.unwrapObject(jsContext.eval("js", script));
+			
+			Value res = jsContext.eval("js", script);
+			return MongoJsUtils.standardizeValue(MongoJsUtils.unwrapObject(res));
 		} catch(Exception ex)
 		{
 			throw ScriptExecutionException.newException("An error occurred while executing below script:\n{}", script, ex);

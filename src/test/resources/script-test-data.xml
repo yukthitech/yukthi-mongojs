@@ -29,7 +29,7 @@
 			
 			var docs = db.MJS_TEST1.find({"name": "testName"});
 			var doc = docToMap(docs[0]);
-			deleteProperty(doc, "_id");
+			doc = deleteProperty(doc, "_id");
 			
 			assertEquals(doc, docToInsert);
 			print("Completed insert.");
@@ -59,8 +59,7 @@
 			db.MJS_TEST1.update({"name": "testName", "list.key": "k1"}, {"$set": {"list.$.value": "val1-mod"}});
 			
 			var doc = db.MJS_TEST1.findOne({"name": "testName"});
-			doc = docToMap(doc);
-			deleteProperty(doc, "_id");
+			doc = deleteProperty(doc, "_id");
 			
 			print("Doc: ", doc);
 			
@@ -87,8 +86,7 @@
 					"age": 1, 
 					"list": {"$elemMatch": {"key": "k1"}}
 				});
-			doc = docToMap(doc);
-			deleteProperty(doc, "_id");
+			doc = deleteProperty(doc, "_id");
 			
 			assertEquals(doc, docPostUpdate);
 		]]></test-script>
@@ -130,8 +128,7 @@
 			
 			for(var i = 0; i < docs.length; i++)
 			{
-				var newDoc = docToMap(docs[i]);
-				deleteProperty(newDoc, "_id");
+				var newDoc = deleteProperty(docs[i], "_id");
 				
 				newDocs.push(newDoc);
 			}
@@ -161,8 +158,7 @@
 			
 			for(var i = 0; i < docs.length; i++)
 			{
-				var newDoc = docToMap(docs[i]);
-				deleteProperty(newDoc, "_id");
+				var newDoc = deleteProperty(docs[i], "_id");
 				
 				newDocs.push(newDoc);
 			}
@@ -185,8 +181,7 @@
 			
 			for(var i = 0; i < docs.length; i++)
 			{
-				var newDoc = docToMap(docs[i]);
-				deleteProperty(newDoc, "_id");
+				var newDoc = deleteProperty(docs[i], "_id");
 				
 				newDocs.push(newDoc);
 			}
@@ -209,8 +204,7 @@
 			
 			while(docs.hasNext())
 			{
-				var newDoc = docToMap(docs.next());
-				deleteProperty(newDoc, "_id");
+				var newDoc = deleteProperty(docs.next(), "_id");
 				
 				newDocs.push(newDoc);
 			}

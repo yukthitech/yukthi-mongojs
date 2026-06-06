@@ -3,14 +3,16 @@ package com.yukthitech.mongojs.db;
 import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.Document;
 import org.graalvm.polyglot.Value;
 
 import com.mongodb.client.AggregateIterable;
+import com.yukthitech.mongojs.MongoJsUtils;
 import com.yukthitech.utils.exceptions.InvalidStateException;
 
-public class MongoAggrDocList extends AbstractList<Document>
+public class MongoAggrDocList extends AbstractList<Map<String, Object>>
 {
 	private AggregateIterable<Document> documentIt;
 	
@@ -27,7 +29,7 @@ public class MongoAggrDocList extends AbstractList<Document>
 		{
 			for(Document doc : documentIt)
 			{
-				callback.execute(doc);
+				callback.execute(MongoJsUtils.documentToStandardMap(doc));
 			}
 		}catch(Exception ex)
 		{
@@ -35,9 +37,10 @@ public class MongoAggrDocList extends AbstractList<Document>
 		}
 	}
 	
-	public Document first()
+	public Map<String, Object> first()
 	{
-		return documentIt.first();
+		Document doc = documentIt.first();
+		return (doc == null) ? null : MongoJsUtils.documentToStandardMap(doc);
 	}
 	
 	private List<Document> listView()
@@ -59,9 +62,9 @@ public class MongoAggrDocList extends AbstractList<Document>
 	}
 
 	@Override
-	public Document get(int index)
+	public Map<String, Object> get(int index)
 	{
-		return listView().get(index);
+		return MongoJsUtils.documentToStandardMap(listView().get(index));
 	}
 
 	@Override

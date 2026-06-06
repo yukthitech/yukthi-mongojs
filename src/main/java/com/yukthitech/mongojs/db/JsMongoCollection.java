@@ -72,14 +72,14 @@ public class JsMongoCollection
 		collection.insertMany(docLst);
 	}
 
-	public Object findOne(Map<String, Object> query) throws Exception
+	public Map<String, Object> findOne(Map<String, Object> query) throws Exception
 	{
 		return findOne(query, null);
 	}
 	
-	public Object findOne(Map<String, Object> query, Map<String, Object> projection) throws Exception
+	public Map<String, Object> findOne(Map<String, Object> query, Map<String, Object> projection) throws Exception
 	{
-		List<Document> docLst = find(query, projection);
+		MongoDocList docLst = find(query, projection);
 		
 		if(CollectionUtils.isEmpty(docLst))
 		{
@@ -95,7 +95,7 @@ public class JsMongoCollection
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Document> find(Map<String, Object> query, Map<String, Object> projection) throws Exception
+	public MongoDocList find(Map<String, Object> query, Map<String, Object> projection) throws Exception
 	{
 		query = (Map<String, Object>) MongoJsUtils.unwrapObject(query);
 		projection = (Map<String, Object>) MongoJsUtils.unwrapObject(projection);
@@ -103,12 +103,12 @@ public class JsMongoCollection
 		logger.debug("Executing equivalent of query: db.{}.find({}, {})", 
 				this.name, MongoMethods.toJson(query), MongoMethods.toJson(projection));
 		
-		Document filterDoc = new Document(query);
+		Document filterDoc = MongoJsUtils.mapToDocument(query);
 		FindIterable<Document> resIt = collection.find(filterDoc);
 		
 		if(projection != null)
 		{
-			resIt.projection(new Document(projection));
+			resIt.projection(MongoJsUtils.mapToDocument(projection));
 		}
 		
 		return new MongoDocList(resIt);
@@ -123,7 +123,7 @@ public class JsMongoCollection
 		
 		for(Map<String, Object> doc : pipeline)
 		{
-			pipelineDocs.add(new Document(doc));
+			pipelineDocs.add(MongoJsUtils.mapToDocument(doc));
 		}
 		
 		AggregateIterable<Document> resIt = collection.aggregate(pipelineDocs);
@@ -136,7 +136,7 @@ public class JsMongoCollection
 	{
 		query = (Map<String, Object>) MongoJsUtils.unwrapObject(query);
 		
-		DeleteResult res = collection.deleteOne(new Document(query));
+		DeleteResult res = collection.deleteOne(MongoJsUtils.mapToDocument(query));
 		return res.getDeletedCount();
 	}
 
@@ -145,7 +145,7 @@ public class JsMongoCollection
 	{
 		query = (Map<String, Object>) MongoJsUtils.unwrapObject(query);
 		
-		DeleteResult res = collection.deleteMany(new Document(query));
+		DeleteResult res = collection.deleteMany(MongoJsUtils.mapToDocument(query));
 		return res.getDeletedCount();
 	}
 	
@@ -153,7 +153,7 @@ public class JsMongoCollection
 	public long count(Map<String, Object> query)
 	{
 		query = (Map<String, Object>) MongoJsUtils.unwrapObject(query);
-		return collection.countDocuments(new Document(query));
+		return collection.countDocuments(MongoJsUtils.mapToDocument(query));
 	}
 
 	public long update(Map<String, Object> filter, Map<String, Object> updates)
@@ -175,11 +175,11 @@ public class JsMongoCollection
 		
 		if(options != null && options.isMulti())
 		{
-			res = collection.updateMany(new Document(filter), new Document(updates), mongoOptions);
+			res = collection.updateMany(MongoJsUtils.mapToDocument(filter), MongoJsUtils.mapToDocument(updates), mongoOptions);
 		}
 		else
 		{
-			res = collection.updateOne(new Document(filter), new Document(updates), mongoOptions);
+			res = collection.updateOne(MongoJsUtils.mapToDocument(filter), MongoJsUtils.mapToDocument(updates), mongoOptions);
 		}
 		
 		return res.getMatchedCount();

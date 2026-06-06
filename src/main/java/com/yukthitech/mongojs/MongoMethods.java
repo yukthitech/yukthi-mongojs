@@ -31,15 +31,41 @@ public class MongoMethods
 		return new ObjectId(id);
 	}
 	
-	public static void deleteProperty(Map<String, Object> obj, String attrName)
+	@SuppressWarnings("unchecked")
+	public static Map<String, Object> deleteProperty(Object obj, String attrName)
 	{
-		obj.remove(attrName);
+		obj = MongoJsUtils.unwrapObject(obj);
+		
+		if(!(obj instanceof Map))
+		{
+			return null;
+		}
+		
+		Map<String, Object> map = new java.util.LinkedHashMap<String, Object>((Map<String, Object>) obj);
+		map.remove(attrName);
+		
+		return map;
 	}
 	
-	public static Object docToMap(Document doc) throws Exception
+	public static Object docToMap(Object doc) throws Exception
 	{
-		String json = doc.toJson();
-		return OBJ_MAPPER.readValue(json, Object.class);
+		if(doc == null)
+		{
+			return null;
+		}
+		
+		if(doc instanceof Document)
+		{
+			String json = ((Document) doc).toJson();
+			return MongoJsUtils.fromBsonExtendedValue(OBJ_MAPPER.readValue(json, Object.class));
+		}
+		
+		if(doc instanceof Map)
+		{
+			return MongoJsUtils.standardizeValue(doc);
+		}
+		
+		throw new IllegalArgumentException("docToMap() expects Document or Map. Specified type: " + doc.getClass().getName());
 	}
 	
 	public static String toJson(Object obj)

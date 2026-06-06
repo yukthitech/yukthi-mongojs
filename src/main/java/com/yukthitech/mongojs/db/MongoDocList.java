@@ -13,7 +13,7 @@ import com.mongodb.client.MongoCursor;
 import com.yukthitech.mongojs.MongoJsUtils;
 import com.yukthitech.utils.exceptions.InvalidStateException;
 
-public class MongoDocList extends AbstractList<Document>
+public class MongoDocList extends AbstractList<Map<String, Object>>
 {
 	private FindIterable<Document> documentIt;
 	
@@ -32,7 +32,7 @@ public class MongoDocList extends AbstractList<Document>
 		{
 			for(Document doc : documentIt)
 			{
-				callback.execute(doc);
+				callback.execute(MongoJsUtils.documentToStandardMap(doc));
 			}
 		}catch(Exception ex)
 		{
@@ -44,7 +44,7 @@ public class MongoDocList extends AbstractList<Document>
 	public MongoDocList sort(Map<String, Object> criteria)
 	{
 		criteria = (Map<String, Object>) MongoJsUtils.unwrapObject(criteria);
-		documentIt.sort(new Document(criteria));
+		documentIt.sort(MongoJsUtils.mapToDocument(criteria));
 		
 		return this;
 	}
@@ -55,9 +55,10 @@ public class MongoDocList extends AbstractList<Document>
 		return this;
 	}
 	
-	public Document first()
+	public Map<String, Object> first()
 	{
-		return documentIt.first();
+		Document doc = documentIt.first();
+		return (doc == null) ? null : MongoJsUtils.documentToStandardMap(doc);
 	}
 	
 	private MongoCursor<Document> getCursor()
@@ -75,9 +76,9 @@ public class MongoDocList extends AbstractList<Document>
 		return getCursor().hasNext();
 	}
 	
-	public Document next()
+	public Map<String, Object> next()
 	{
-		return getCursor().next();
+		return MongoJsUtils.documentToStandardMap(getCursor().next());
 	}
 	
 	public boolean getHasNext()
@@ -85,9 +86,9 @@ public class MongoDocList extends AbstractList<Document>
 		return getCursor().hasNext();
 	}
 	
-	public Document getNext()
+	public Map<String, Object> getNext()
 	{
-		return getCursor().next();
+		return MongoJsUtils.documentToStandardMap(getCursor().next());
 	}
 	
 	private List<Document> listView()
@@ -109,9 +110,9 @@ public class MongoDocList extends AbstractList<Document>
 	}
 
 	@Override
-	public Document get(int index)
+	public Map<String, Object> get(int index)
 	{
-		return listView().get(index);
+		return MongoJsUtils.documentToStandardMap(listView().get(index));
 	}
 
 	@Override
