@@ -15,11 +15,12 @@ import org.apache.logging.log4j.Logger;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.yukthitech.mongojs.common.MongoJsArguments;
 import com.yukthitech.mongojs.db.JsMongoDatabase;
@@ -74,26 +75,21 @@ public class MongoJsEngine
 		String database = args.getDbname();
 		
 		MongoCredential credential = (StringUtils.isNotBlank(user) && StringUtils.isNotBlank(password)) ? MongoCredential.createCredential(user, database, password.toCharArray()) : null;
-		List<ServerAddress> mongoHosts = null;
 
 		String replicas = args.getReplicas();
-		mongoHosts = parse(replicas);
+		List<ServerAddress> mongoHosts = parse(replicas);
 		
-		MongoClientOptions clientOptions = MongoClientOptions.builder()
-				.writeConcern(WriteConcern.ACKNOWLEDGED)
-				.sslEnabled(args.isEnableSsl())
-				.build();
-				
-		MongoClient mongoClient = null;
+		MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder()
+				.applyToClusterSettings(builder -> builder.hosts(mongoHosts))
+				.applyToSslSettings(builder -> builder.enabled(args.isEnableSsl()))
+				.writeConcern(WriteConcern.ACKNOWLEDGED);
 		
 		if(credential != null)
 		{
-			mongoClient = new MongoClient(mongoHosts, credential, clientOptions);
+			settingsBuilder.credential(credential);
 		}
-		else
-		{
-			mongoClient = new MongoClient(mongoHosts, clientOptions);
-		}
+		
+		MongoClient mongoClient = MongoClients.create(settingsBuilder.build());
 		
 		this.setDb(mongoClient.getDatabase(database));
 		logger.debug("Connected to mongocluster {} successfully", replicas);
