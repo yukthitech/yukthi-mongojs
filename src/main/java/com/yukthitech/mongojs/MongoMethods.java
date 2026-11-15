@@ -1,6 +1,9 @@
 package com.yukthitech.mongojs;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -21,8 +24,6 @@ public class MongoMethods
 	private static Logger logger = LogManager.getLogger(MongoMethods.class);
 	
 	public static ObjectMapper OBJ_MAPPER = new ObjectMapper();
-	
-	private static final String ISO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 	
 	private static final String DEF_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -56,8 +57,10 @@ public class MongoMethods
 		
 		if(doc instanceof Document)
 		{
-			String json = ((Document) doc).toJson();
-			return MongoJsUtils.fromBsonExtendedValue(OBJ_MAPPER.readValue(json, Object.class));
+			// Walk the document tree directly so Date/ObjectId millis and types are preserved.
+			// Document.toJson() relaxed ISO strings drop trailing fractional zeros and were
+			// mis-parsed by SimpleDateFormat (e.g. ".1Z" -> 1ms instead of 100ms).
+			return MongoJsUtils.documentToStandardMap((Document) doc);
 		}
 		
 		if(doc instanceof Map)
@@ -116,8 +119,16 @@ public class MongoMethods
 	
 	public static Date ISODate(String dateStr) throws Exception
 	{
-		SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_DATE_FORMAT);
-		return dateFormat.parse(dateStr);
+		// Instant/OffsetDateTime accept variable-length fractional seconds from
+		// MongoDB relaxed Extended JSON (e.g. ".1Z", ".12Z", or no fraction).
+		try
+		{
+			return Date.from(Instant.parse(dateStr));
+		}
+		catch(DateTimeParseException ex)
+		{
+			return Date.from(OffsetDateTime.parse(dateStr).toInstant());
+		}
 	}
 
 	public static Date date(String dateStr) throws Exception

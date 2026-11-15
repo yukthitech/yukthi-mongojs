@@ -266,17 +266,49 @@ public class MongoJsUtils
 		return value;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static Map<String, Object> documentToStandardMap(Document doc)
 	{
-		try
+		Map<String, Object> res = new LinkedHashMap<String, Object>();
+		
+		for(Map.Entry<String, Object> entry : doc.entrySet())
 		{
-			return (Map<String, Object>) MongoMethods.docToMap(doc);
+			res.put(entry.getKey(), fromDocumentValue(entry.getValue()));
 		}
-		catch(Exception ex)
+		
+		return res;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static Object fromDocumentValue(Object value)
+	{
+		if(value == null)
 		{
-			throw new IllegalStateException("An error occurred while converting document to map", ex);
+			return null;
 		}
+		
+		if(value instanceof Document)
+		{
+			return documentToStandardMap((Document) value);
+		}
+		
+		if(value instanceof List)
+		{
+			List<Object> res = new ArrayList<Object>();
+			
+			for(Object item : (List<Object>) value)
+			{
+				res.add(fromDocumentValue(item));
+			}
+			
+			return res;
+		}
+		
+		if(value instanceof Map)
+		{
+			return fromBsonExtendedValue(value);
+		}
+		
+		return value;
 	}
 	
 	private static List<Map<String, Object>> standardizeDocList(MongoDocList docList)
@@ -335,6 +367,11 @@ public class MongoJsUtils
 			if(inputMap.size() == 1 && inputMap.containsKey("$date"))
 			{
 				return toDateFromExtendedJson(inputMap.get("$date"));
+			}
+			
+			if(inputMap.size() == 1 && inputMap.containsKey("$oid"))
+			{
+				return new ObjectId(String.valueOf(inputMap.get("$oid")));
 			}
 			
 			Map<String, Object> res = new LinkedHashMap<String, Object>();
@@ -407,7 +444,8 @@ public class MongoJsUtils
 				|| input instanceof Boolean
 				|| input instanceof Character
 				|| input instanceof Number
-				|| input instanceof Date;
+				|| input instanceof Date
+				|| input instanceof ObjectId;
 	}
 	
 	public static <T> T convert(Object input, Class<T> type)
